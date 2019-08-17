@@ -543,7 +543,7 @@ namespace BuffUtil
         {
             try
             {
-                if (!monster.IsDamageableMonster())
+                if (!monster.IsTargetable)
                     return false;
 
                 var monsterPosition = monster.Pos;
@@ -564,7 +564,7 @@ namespace BuffUtil
 
         public override void EntityAdded(EntityWrapper entityWrapper)
         {
-            if (!entityWrapper.IsMonster()) return;
+            if (!entityWrapper.HasComponent<Monster>()) return;
 
             lock (loadedMonstersLock)
             {
