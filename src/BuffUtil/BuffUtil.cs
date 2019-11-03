@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using WindowsInput;
 using WindowsInput.Native;
-using PoeHUD.Models;
-using PoeHUD.Plugins;
-using PoeHUD.Poe.Components;
-using PoeHUD.Poe.RemoteMemoryObjects;
+using ExileCore;
+using ExileCore.PoEMemory.Components;
+using ExileCore.PoEMemory.MemoryObjects;
 using SharpDX;
 
 namespace BuffUtil
@@ -47,7 +46,7 @@ namespace BuffUtil
         private static readonly TimeSpan kBloodRageMinTimeBetweenCasts = TimeSpan.FromSeconds(1);
         private static readonly TimeSpan kPhaseRunMinTimeBetweenCasts = TimeSpan.FromSeconds(1);
 
-        private readonly HashSet<EntityWrapper> loadedMonsters = new HashSet<EntityWrapper>();
+        private readonly HashSet<Entity> loadedMonsters = new HashSet<Entity>();
         private readonly object loadedMonstersLock = new object();
 
         private List<Buff> buffs;
@@ -65,15 +64,14 @@ namespace BuffUtil
         private int? nearbyMonsterCount;
         private bool showErrors = true;
 
-        public override void Initialise()
+        public override bool Initialise()
         {
-            base.Initialise();
-            PluginName = "BuffUtil";
             inputSimulator = new InputSimulator();
             rand = new Random();
 
             showErrors = !Settings.SilenceErrors;
             Settings.SilenceErrors.OnValueChanged += delegate { showErrors = !Settings.SilenceErrors; };
+            return base.Initialise();
         }
 
         public override void OnPluginDestroyForHotReload()
@@ -517,10 +515,10 @@ namespace BuffUtil
 
             var playerPosition = GameController.Game.IngameState.Data.LocalPlayer.GetComponent<Render>().Pos;
 
-            List<EntityWrapper> localLoadedMonsters;
+            List<Entity> localLoadedMonsters;
             lock (loadedMonstersLock)
             {
-                localLoadedMonsters = new List<EntityWrapper>(loadedMonsters);
+                localLoadedMonsters = new List<Entity>(loadedMonsters);
             }
 
             var maxDistance = Settings.NearbyMonsterMaxDistance.Value;
@@ -539,7 +537,7 @@ namespace BuffUtil
             return result;
         }
 
-        private bool IsValidNearbyMonster(EntityWrapper monster, Vector3 playerPosition, int maxDistanceSquared)
+        private bool IsValidNearbyMonster(Entity monster, Vector3 playerPosition, int maxDistanceSquared)
         {
             try
             {
@@ -562,7 +560,7 @@ namespace BuffUtil
             }
         }
 
-        public override void EntityAdded(EntityWrapper entityWrapper)
+        public override void EntityAdded(Entity entityWrapper)
         {
             if (!entityWrapper.HasComponent<Monster>()) return;
 
@@ -572,7 +570,7 @@ namespace BuffUtil
             }
         }
 
-        public override void EntityRemoved(EntityWrapper entityWrapper)
+        public override void EntityRemoved(Entity entityWrapper)
         {
             lock (loadedMonstersLock)
             {

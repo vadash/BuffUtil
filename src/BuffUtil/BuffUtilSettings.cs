@@ -1,11 +1,11 @@
-﻿using System;
-using System.Windows.Forms;
-using PoeHUD.Hud.Settings;
-using PoeHUD.Plugins;
+﻿using System.Windows.Forms;
+using ExileCore.Shared.Interfaces;
+using ExileCore.Shared.Nodes;
+using ExileCore.Shared.Attributes;
 
 namespace BuffUtil
 {
-    public class BuffUtilSettings : SettingsBase
+    public class BuffUtilSettings : ISettings
     {
         public BuffUtilSettings()
         {
@@ -51,6 +51,7 @@ namespace BuffUtil
             DisableInHideout = new ToggleNode(true);
             Debug = new ToggleNode(false);
             SilenceErrors = new ToggleNode(false);
+            Enable = new ToggleNode(true);
         }
 
         #region Blood Rage
@@ -180,5 +181,7 @@ namespace BuffUtil
         public ToggleNode SilenceErrors { get; set; }
 
         #endregion
+        
+        public ToggleNode Enable { get; set; }
     }
 }
